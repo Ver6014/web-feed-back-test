@@ -18,153 +18,18 @@
   </style>
 <canvas id="can" width="1000px" height="1000px" data-fragment-url="pxshaders.js"></canvas>
 <div></div>
-<script>
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
-var context = new AudioContext();
-var canvas = document.getElementById('can');
+<script>var canvas = document.getElementById('can');
 var c = canvas.getContext('2d');
 var fb = new Image();
 
 c.fillRect(20,50,960,100);
-c.fillStyle="pink";
+c.fillStyle="white";
 c.fillRect(20,100,400,50);
 //c.drawImage(start,0,0);
 animate();
-var trans = new glitchTransition();
-canvas.width = window.innerWidth;
-canvas.height  = window.innerHeight;
-window.onresize = function(){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-};
 
-var overmax = false;
-
-$(document).ready(function(){
-  $(window).keydown(function(e){
-    if(!overmax) voices[next] = new FMSynth(sets[e.which]);
-    else voices[next].change(sets[e.which]);
-    next++;
-    if(next>=voicemax){
-      next = 0;
-      overmax = true;
-    }
-    trans.activate();
-  });
-});
-
-var sets = [];
-var voices = [];
-var next = 0;
-var voicemax = 10;
-
-for (var x=0;x<256;x++){
-  sets[x]=new FMSet();
-}
-
-;
-function FMSet(){
-  this.carrier = Math.random()*1000+100;
-  this.mod = this.carrier*Math.random()*5;
-  this.harm = Math.random()*20+0.001;
-  this.fb = Math.random()*0.6;
-  this.adsr = [Math.random()*1+0.001,Math.random()*0.5+0.001,Math.random()+0.1,Math.random()*1];
-  this.fmadsr = [Math.random()*+0.001,Math.random()*0.5+0.001,Math.random()+0.3,Math.random()*2];
-};
-
-function FMSynth(fmset){
-   this.set = fmset;
-   this.cwave = context.createOscillator();
-   this.mwave = context.createOscillator();
-   this.mamp = context.createGain();
-   this.amp = context.createGain();
-   this.fb = context.createGain();
-   this.init = function(set){
-     this.cwave.frequency.value = set.carrier;
-     this.mwave.frequency.value = set.carrier*set.harm;
-     this.fb.gain.value = set.fb;
-     this.cwave.connect(this.amp);
-     this.mwave.connect(this.mamp);
-     this.mamp.connect(this.cwave.frequency);
-     this.amp.connect(context.destination);
-     this.cwave.connect(this.fb);
-     this.fb.connect(this.mamp);
-     this.cwave.start(0);
-     this.mwave.start(0);
-     doADSR(this.mamp,set.fmadsr,set.mod);
-     doADSR(this.amp,set.adsr,0.5);
-   };
-   this.init(this.set);
-   this.change = function(set){
-     this.cwave.frequency.value = set.carrier;
-     this.mwave.frequency.value = set.carrier*set.harm;
-     this.fb.gain.value = set.fb;
-     doADSR(this.mamp,set.fmadsr,set.mod);
-     doADSR(this.amp,set.adsr,0.25);
-   };
-};
-
-function doADSR(amp,adsr,level){
-    var now = context.currentTime;
-    amp.gain.cancelScheduledValues(now);
-    amp.gain.setValueAtTime(0,now);
-    amp.gain.linearRampToValueAtTime(level,now+adsr[0]);
-    amp.gain.linearRampToValueAtTime(level*adsr[2], now+adsr[0]+adsr[1]);
-    amp.gain.linearRampToValueAtTime(0, now+adsr[0]+adsr[1]+adsr[3]);
-}
-
-
-function glitchTransition(){
-    this.canvas = canvas;
-    this.c = this.canvas.getContext('2d');
-    this.tt = 0;
-    this.active = true;
-    this.time = 30;
-    //does the copy/paste smearing of the image
-    this.shiftpix = function(){
-    	var tx = Math.random()*800;
-        var ty = Math.random()*800;
-        var b = 0;
-        var sx = Math.random()*(this.canvas.width-tx);
-        var sy = Math.random()*(this.canvas.height-ty);
-        var dx = Math.floor(Math.random()*20)-10;
-        var dy = Math.floor(Math.random()*20)-10;
-        for(b=0;b<4;b++){
-            this.c.drawImage(this.canvas,Math.min(Math.max(sx+dx*b,0),this.canvas.width),Math.min(Math.max(sy+dy*b,0),this.canvas.height),tx,ty,sx,sy,tx,ty);
-        }
-    };
-    //splatters of the original image
-    this.activate = function(){
-        this.active = true;
-        this.tt = 0;
-    }
-    this.deactivate = function(){
-        //this.c.clearRect(0,0,this.canvas.width,this.canvas.width);
-        this.active = 0;
-    }
-    this.draw = function(){
-        this.c.fillStyle = randomcolor();
-        this.c.fillRect(Math.random()*this.canvas.width,Math.random()*this.canvas.height,Math.random()*800,Math.random()*800);
-        this.shiftpix();
-        this.c.clearRect(Math.random()*this.canvas.width,Math.random()*this.canvas.height,Math.random()*800,Math.random()*800);
-        this.shiftpix();
-        this.c.clearRect(Math.random()*this.canvas.width,Math.random()*this.canvas.height,Math.random()*200,Math.random()*200);
-        this.shiftpix();
-        this.tt++;
-        if (this.active && this.tt>this.time) this.deactivate();
-    }
-}
-
-//generate a random rgb color
-function randomcolor(){
-    return 'rgb('+
-      Math.floor(Math.random()*256)+','+
-      Math.floor(Math.random()*256)+','+
-      Math.floor(Math.random()*256)+')';
-}
 function animate() {
 	window.requestAnimationFrame(animate);
-	
   c.save();
   c.beginPath();
  c.moveTo(Math.random()*1000,Math.random()*1000);
