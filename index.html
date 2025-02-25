@@ -1,1 +1,27 @@
 <canvas id="can" width="1000px" height="1000px"></canvas>
+
+<script>
+var canvas = document.getElementById('can');
+var c = canvas.getContext('2d');
+var fb = new Image();
+
+c.fillRect(20,50,960,100);
+c.fillStyle="white";
+c.fillRect(20,100,400,50);
+//c.drawImage(start,0,0);
+animate();
+
+function animate() {
+	window.requestAnimationFrame(animate);
+  c.save();
+  c.beginPath();
+ c.moveTo(Math.random()*1000,Math.random()*1000);
+  c.lineTo(Math.random()*1000,Math.random()*1000);
+  c.lineTo(Math.random()*1000,Math.random()*1000);
+  c.lineTo(Math.random()*1000,Math.random()*1000);
+  c.closePath();
+  c.clip();
+  c.drawImage(fb,Math.random()*80-40,Math.random()*50-25);
+  c.restore();
+  fb.src = canvas.toDataURL();
+}</script>
