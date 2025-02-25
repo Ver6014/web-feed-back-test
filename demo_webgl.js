@@ -12,7 +12,7 @@ var webcam=document.createElement('video');
 
 //set the initial state of the effect
 var FLOWSTATE = {
-	warp:	0.05,
+	warp:	1.05,
 	mixin:	0.1,
 	aspect: c.width/c.height
 }
