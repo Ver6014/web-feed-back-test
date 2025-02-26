@@ -1,9 +1,13 @@
 <script>var canvas = document.getElementById('can');
 var c = canvas.getContext('2d');
-var fb = image(src = "2.jpg");
+var fb = new image();
+
+const grad=c.createLinearGradient(0,0, 280,0);
+grad.addColorStop(0, "#05ffa1");
+grad.addColorStop(1, "#01cdfe");
 
 c.fillRect(20,50,960,100);
-c.fillStyle="white";
+c.fillStyle= grad;
 c.fillRect(20,100,400,50);
 //c.drawImage(start,0,0);
 animate();
